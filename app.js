@@ -43,6 +43,7 @@
         escaneres: 'Hola, necesito escáneres, refacciones o consumibles.',
         datos: 'Hola, tengo un disco duro con problemas y quiero que evalúen mi caso para recuperar la información.',
         soporte: 'Hola, necesito soporte técnico o reparación de equipos.',
+        digitalizacion: 'Hola, necesito cotizar el escaneo, resguardo y digitalización masiva de información (expedientes, documentos contables, información histórica o planos).',
         empezar: 'Hola, estoy listo para empezar. Quiero una propuesta de tecnología para mi empresa.',
         duda: 'Hola, tengo una duda sobre sus servicios de TI.',
         oficinas: 'Hola, quiero armar la solución de TI para mi oficina o corporativo.',

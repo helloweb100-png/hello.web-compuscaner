@@ -404,7 +404,7 @@ html.lenis, html.lenis body { height: auto; }
 .js .enter { opacity: 0; }
 .is-ready .enter { animation: enterUp 1s var(--ease) calc(.1s + var(--i, 0) * .11s) both; }
 
-/* Visual: lente + haz de escaneo + 7 servicios en órbita */
+/* Visual: lente + haz de escaneo + 8 servicios en órbita */
 .hero-visual { position: relative; z-index: 1; }
 .hv { position: relative; width: min(76vw, 470px); aspect-ratio: 1; margin-inline: auto; }
 .js .hv { opacity: 0; }
@@ -446,6 +446,7 @@ html.lenis, html.lenis body { height: auto; }
 .hv-node:nth-child(5) { --c: var(--lime); }
 .hv-node:nth-child(6) { --c: var(--teal); }
 .hv-node:nth-child(7) { --c: var(--violet); }
+.hv-node:nth-child(8) { --c: var(--sky); }
 
 .hv-lens {
     position: absolute; inset: 13%; overflow: hidden; border-radius: 50%;
@@ -607,11 +608,12 @@ html.lenis, html.lenis body { height: auto; }
 .tile--scan { --c: var(--lime); }
 .tile--data { --c: var(--teal); }
 .tile--support { --c: var(--coral); }
+.tile--digital { --c: var(--violet); }
 
 @media (min-width: 768px) {
     .bento { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
     .tile { min-height: 440px; }
-    .tile--support { grid-column: 1 / -1; min-height: 0; }
+    .tile--support, .tile--digital { grid-column: 1 / -1; min-height: 0; }
     .tile--light .tile-media, .tile--split .tile-media { height: 240px; }
 }
 @media (min-width: 1024px) {
@@ -622,14 +624,14 @@ html.lenis, html.lenis body { height: auto; }
     .tile--print { grid-column: span 7; }
     .tile--scan { grid-column: span 7; }
     .tile--data { grid-column: span 5; }
-    .tile--support { grid-column: span 12; }
+    .tile--support, .tile--digital { grid-column: span 12; }
 
     .tile--split { flex-direction: row; min-height: 380px; }
     .tile--split .tile-media { height: auto; flex: 0 0 42%; }
     .tile--split .tile-body { justify-content: center; padding: 2rem 2.25rem; }
     .tile--support .tile-media { order: 2; flex-basis: 46%; }
-    .tile--support .tile-body { padding-inline: 3rem; }
-    .tile--support p { max-width: 52ch; }
+    .tile--support .tile-body, .tile--digital .tile-body { padding-inline: 3rem; }
+    .tile--support p, .tile--digital p { max-width: 52ch; }
 }
 
 /* ===== 13. BANDA DE MARCA (verde azulado profundo) ===== */
