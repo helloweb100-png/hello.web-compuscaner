@@ -23,11 +23,11 @@
        ================================================================= */
     const CONFIG = {
         brand: 'Proyectos Especializados',
-        // PENDIENTE: número de WhatsApp del negocio, con código de país y sin "+" ni espacios.
-        // Ejemplo (México): '525512345678'
-        whatsapp: '520000000000',
+        // Números de WhatsApp del negocio, con código de país y sin "+" ni espacios (México: 52 + 10 dígitos).
+        // Con dos o más, los botones de WhatsApp dejan elegir a cuál número escribir.
+        whatsapp: ['525550600531', '525540921997'],
         // Opcionales: si se dejan vacíos, no se muestran en la página.
-        email: '',
+        email: 'hmartinez@proyectosespecializados.com',
         address: '',
         hours: ''
     };
@@ -71,12 +71,13 @@
         try { return fn(); } catch (error) { console.error('[' + name + ']', error); return undefined; }
     };
 
-    const isPlaceholderNumber = () => /^0+$/.test(CONFIG.whatsapp.slice(2));
-    const waURL = (message) => 'https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(message);
+    const waURL = (message, number = CONFIG.whatsapp[0]) => 'https://wa.me/' + number + '?text=' + encodeURIComponent(message);
 
-    const formatPhone = () => {
-        const digits = CONFIG.whatsapp.replace(/\D/g, '');
-        if (isPlaceholderNumber()) return '';
+    // Selector de número (lo define initWhatsAppPicker; sigue en null si solo hay un número)
+    const waPicker = { open: null };
+
+    const formatPhone = (number) => {
+        const digits = number.replace(/\D/g, '');
         if (digits.length === 12 && digits.startsWith('52')) {
             return '+52 ' + digits.slice(2, 4) + ' ' + digits.slice(4, 8) + ' ' + digits.slice(8);
         }
@@ -220,16 +221,18 @@
        5. HEADER, MENÚ, NAVEGACIÓN
        ================================================================= */
     function initWhatsAppLinks() {
+        // data-wa-n="0|1": enlace directo a ese número (muestra el número como texto).
+        // Sin data-wa-n: va al primer número y, si hay varios, el selector deja elegir (ver initWhatsAppPicker).
         $$('[data-wa]').forEach((a) => {
-            a.href = waURL(MESSAGES[a.dataset.wa] || MESSAGES.general);
+            const line = a.dataset.waN;
+            const number = CONFIG.whatsapp[line === undefined ? 0 : Number(line)];
+            a.href = waURL(MESSAGES[a.dataset.wa] || MESSAGES.general, number);
             a.target = '_blank';
             a.rel = 'noopener noreferrer';
+            if (line !== undefined) a.textContent = formatPhone(number);
         });
 
         // Datos de contacto: solo se muestran los que tienen valor
-        const phone = formatPhone();
-        if (phone) $$('[data-bind="phone"]').forEach((el) => { el.textContent = phone; });
-
         const bindings = { email: CONFIG.email, address: CONFIG.address, hours: CONFIG.hours };
         Object.keys(bindings).forEach((key) => {
             const value = bindings[key];
@@ -240,10 +243,56 @@
             });
             $$('[data-contact="' + key + '"]').forEach((el) => { el.hidden = false; });
         });
+    }
 
-        if (isPlaceholderNumber()) {
-            console.warn('[Proyectos Especializados] Configura el número de WhatsApp en CONFIG.whatsapp (app.js).');
-        }
+    // Con dos o más números, cada botón de WhatsApp abre un selector para elegir a cuál escribir.
+    // Si el selector no está disponible, el botón sigue yendo directo al primer número.
+    function initWhatsAppPicker() {
+        const dialog = $('#wa-picker');
+        const list = dialog && $('.wa-picker-list', dialog);
+        if (!list || CONFIG.whatsapp.length < 2 || typeof dialog.showModal !== 'function') return;
+
+        let onPick = null;
+
+        CONFIG.whatsapp.forEach((number) => {
+            const link = document.createElement('a');
+            link.className = 'wa-picker-option';
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.dataset.number = number;
+            link.innerHTML = '<i class="ph ph-whatsapp-logo" aria-hidden="true"></i><span></span><i class="ph ph-arrow-up-right" aria-hidden="true"></i>';
+            $('span', link).textContent = formatPhone(number);
+            list.appendChild(link);
+        });
+
+        waPicker.open = (message, callback) => {
+            $$('.wa-picker-option', list).forEach((link) => { link.href = waURL(message, link.dataset.number); });
+            onPick = callback || null;
+            if (lenis) lenis.stop();
+            dialog.showModal();
+        };
+
+        dialog.addEventListener('close', () => {
+            // Si el menú móvil sigue abierto, el scroll debe seguir detenido
+            if (lenis && !document.documentElement.classList.contains('menu-open')) lenis.start();
+        });
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog || e.target.closest('[data-wa-close]')) dialog.close();
+        });
+        list.addEventListener('click', (e) => {
+            const link = e.target.closest('.wa-picker-option');
+            if (!link) return;
+            dialog.close(); // el enlace abre WhatsApp por sí mismo
+            if (onPick) onPick(link.href);
+        });
+
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a[data-wa]:not([data-wa-n])');
+            if (!link) return;
+            e.preventDefault();
+            const message = MESSAGES[link.dataset.wa] || MESSAGES.general;
+            waPicker.open(message);
+        });
     }
 
     function initHeader() {
@@ -613,7 +662,27 @@
             if (message) lines.push(message);
             if (phone) lines.push('Mi teléfono: ' + phone);
             lines.push('Vi su página y quisiera recibir una cotización.');
-            const url = waURL(lines.join('\n'));
+            const text = lines.join('\n');
+
+            const notifySent = (url) => {
+                status.classList.add('is-ok');
+                status.textContent = 'Listo. Abrimos WhatsApp con tu mensaje. ';
+                const retry = document.createElement('a');
+                retry.href = url; retry.target = '_blank'; retry.rel = 'noopener noreferrer';
+                retry.textContent = 'Si no se abrió, haz clic aquí.';
+                status.appendChild(retry);
+
+                setTimeout(() => {
+                    form.reset();
+                    button.disabled = false;
+                    buttonLabel.textContent = idleLabel;
+                }, 900);
+            };
+
+            // Con varios números, primero se elige a cuál escribir; el formulario se limpia al elegir
+            if (waPicker.open) { status.textContent = ''; waPicker.open(text, notifySent); return; }
+
+            const url = waURL(text);
 
             button.disabled = true;
             buttonLabel.textContent = 'Abriendo WhatsApp…';
@@ -621,18 +690,7 @@
             const popup = window.open(url, '_blank');
             if (popup) popup.opener = null; else window.location.href = url;
 
-            status.classList.add('is-ok');
-            status.textContent = 'Listo. Abrimos WhatsApp con tu mensaje. ';
-            const retry = document.createElement('a');
-            retry.href = url; retry.target = '_blank'; retry.rel = 'noopener noreferrer';
-            retry.textContent = 'Si no se abrió, haz clic aquí.';
-            status.appendChild(retry);
-
-            setTimeout(() => {
-                form.reset();
-                button.disabled = false;
-                buttonLabel.textContent = idleLabel;
-            }, 900);
+            notifySent(url);
         });
     }
 
@@ -752,6 +810,7 @@
        ================================================================= */
     function boot() {
         safe('whatsapp', initWhatsAppLinks);
+        safe('wa-picker', initWhatsAppPicker);
         safe('split', initSplitText);
         safe('tabs', initTabs);
         safe('faq', initFAQ);

@@ -952,7 +952,7 @@ html.lenis, html.lenis body { height: auto; }
 }
 .contact-list span { display: block; font-family: var(--mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: rgba(15, 27, 34, .74); }
 .contact-list a, .contact-list p { font-size: 1.15rem; font-weight: 600; line-height: 1.35; }
-.contact-list a { border-bottom: 2px solid var(--ink); transition: opacity .3s; }
+.contact-list a { border-bottom: 2px solid var(--ink); transition: opacity .3s; overflow-wrap: anywhere; }
 .contact-list a:hover { opacity: .7; }
 
 .form-card {
@@ -1039,6 +1039,40 @@ html.lenis, html.lenis body { height: auto; }
     transition: opacity .35s, transform .35s var(--ease);
 }
 .wa-float:hover .wa-tip, .wa-float.show-tip .wa-tip { opacity: 1; transform: translate(0, -50%); }
+
+/* Selector de número de WhatsApp */
+.wa-picker {
+    position: fixed; inset: 0; margin: auto;
+    width: min(calc(100% - var(--gutter) * 2), 420px); height: fit-content; max-height: calc(100dvh - 2rem);
+    padding: 1.75rem 1.5rem 1.5rem; border: 0; border-radius: var(--r-lg);
+    background: var(--surface); color: var(--ink);
+    box-shadow: 0 40px 80px -30px rgba(15, 27, 34, .6);
+}
+.wa-picker[open] { animation: panelIn .45s var(--ease); }
+.wa-picker::backdrop { background: rgba(15, 27, 34, .62); backdrop-filter: blur(4px); }
+.wa-picker h2 { padding-right: 2.75rem; font-size: 1.5rem; }
+.wa-picker p { margin-top: .4rem; color: var(--muted); }
+.wa-picker-close {
+    position: absolute; top: .9rem; right: .9rem; width: 40px; height: 40px;
+    display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line-strong);
+    font-size: 1.2rem; transition: border-color .25s;
+}
+.wa-picker-close:hover { border-color: var(--ink); }
+.wa-picker-list { display: grid; gap: .75rem; margin-top: 1.4rem; }
+.wa-picker-option {
+    display: flex; align-items: center; gap: .9rem; padding: .85rem 1.1rem .85rem .85rem;
+    border: 1px solid var(--line-strong); border-radius: var(--r-md);
+    font-size: 1.1rem; font-weight: 600; letter-spacing: -.01em;
+    transition: border-color .25s, translate .35s var(--ease), box-shadow .35s var(--ease);
+}
+.wa-picker-option:hover { border-color: var(--ink); translate: 0 -2px; box-shadow: var(--shadow-sm); }
+.wa-picker-option > i:first-child {
+    flex: none; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%;
+    background: var(--wa); color: #fff; font-size: 1.65rem;
+}
+.wa-picker-option > span { flex: 1; }
+.wa-picker-option > i:last-child { font-size: 1.2rem; color: var(--soft); transition: transform .35s var(--ease); }
+.wa-picker-option:hover > i:last-child { transform: translate(3px, -3px); color: var(--ink); }
 
 /* ===== 22. KEYFRAMES ===== */
 @keyframes spin { to { transform: rotate(360deg); } }

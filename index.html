@@ -835,7 +835,11 @@
             <ul class="contact-list reveal" style="--d:.15s">
                 <li data-contact="whatsapp">
                     <i class="ph ph-whatsapp-logo" aria-hidden="true"></i>
-                    <div><span>WhatsApp</span><a href="#contacto" data-wa="general" data-bind="phone">Escríbenos por WhatsApp</a></div>
+                    <div>
+                        <span>WhatsApp</span>
+                        <p><a href="#contacto" data-wa="general" data-wa-n="0">Escríbenos por WhatsApp</a></p>
+                        <p><a href="#contacto" data-wa="general" data-wa-n="1">Escríbenos por WhatsApp</a></p>
+                    </div>
                 </li>
                 <li data-contact="email" hidden>
                     <i class="ph ph-envelope-simple" aria-hidden="true"></i>
@@ -953,7 +957,8 @@
             <div class="footer-col">
                 <h2>Contacto</h2>
                 <ul>
-                    <li><a href="#contacto" data-wa="general" data-bind="phone">WhatsApp</a></li>
+                    <li><a href="#contacto" data-wa="general" data-wa-n="0">WhatsApp</a></li>
+                    <li><a href="#contacto" data-wa="general" data-wa-n="1">WhatsApp</a></li>
                     <li><a href="#contacto">Formulario de cotización</a></li>
                     <li data-contact="email" hidden><a href="#contacto" data-bind="email"></a></li>
                 </ul>
@@ -972,6 +977,14 @@
     <span class="wa-tip">¿Hablamos?</span>
     <i class="ph ph-whatsapp-logo" aria-hidden="true"></i>
 </a>
+
+<!-- ===== SELECTOR DE NÚMERO DE WHATSAPP (las opciones las crea app.js desde CONFIG.whatsapp) ===== -->
+<dialog class="wa-picker" id="wa-picker" aria-labelledby="wa-picker-title">
+    <button class="wa-picker-close" type="button" aria-label="Cerrar" data-wa-close><i class="ph ph-x" aria-hidden="true"></i></button>
+    <h2 id="wa-picker-title">Elige un número de WhatsApp</h2>
+    <p>Tu mensaje ya va escrito, solo envíalo.</p>
+    <div class="wa-picker-list"></div>
+</dialog>
 
 <!-- Librerías de scroll (mejora progresiva: la página funciona sin ellas) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
